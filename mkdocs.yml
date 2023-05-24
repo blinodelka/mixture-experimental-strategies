@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
+INHERIT: mkdocs/base.yml  # use the shared AutoRA configuration by default
+
+site_name: AutoRA mixture_experimentalist
+repo_url: 'https://github.com/blinodelka/mixture_experimental_strategies'
+
+nav:
+- Home: 'index.md'
+- Quickstart: 'quickstart.md'
+- Examples:
+  - Basic Usage: 'basic-usage.ipynb'
+  - Additional Example: 'additional-example.ipynb'
