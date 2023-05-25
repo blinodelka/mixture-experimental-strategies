@@ -20,6 +20,8 @@ def adjust_distribution(p, temperature):
         p = p / np.sum(p) # Normalizing the final distribution
         return p
 
+
+    
 def mixture_sampler(
     condition_pool: np.ndarray, weights: np.ndarray, temperature: int, 
     X_ref: np.ndarray, 
@@ -57,14 +59,13 @@ def mixture_sampler(
     familiarity_scores[novelty_scores>0]=0
     novelty_scores[novelty_scores<0]=0
     
-    
     # aligning the arrays based on the observations (condition pools)
-    novelty_indices = np.argsort(novelty_ranking)
+    novelty_indices = np.argsort(novelty_ranking, axis=None)
     ranking_sorted = novelty_ranking[novelty_indices]
     novelty_scores_sorted = novelty_scores[novelty_indices]
     familiarity_scores_sorted = familiarity_scores[novelty_indices]
 
-    falsification_indices = np.argsort(falsification_ranking)
+    falsification_indices = np.argsort(falsification_ranking, axis=None)
     falsification_scores_sorted = falsification_scores[falsification_indices]    
     confirmation_scores_sorted = confirmation_scores[falsification_indices] 
     
@@ -78,7 +79,7 @@ def mixture_sampler(
     if num_samples is None:
         num_samples = condition_pool.shape[0]
     
-    conditions = np.random.choice(ranking_sorted, num_samples,
-              p=weighted_mixture_scores_adjusted)
+    conditions = np.random.choice(ranking_sorted.T.squeeze(), num_samples,
+              p=weighted_mixture_scores_adjusted, replace = False)
     
     return conditions
