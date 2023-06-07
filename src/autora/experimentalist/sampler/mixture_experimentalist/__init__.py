@@ -11,14 +11,15 @@ from autora.experimentalist.sampler import compute_dissimilarity # not sure if t
 
 def adjust_distribution(p, temperature):
         # temperature cannot be 0
+        assert temperature != 0, 'Temperature cannot be 0'
+
         #If the temperature is very low (close to 0), then the sampling will become almost deterministic, picking the event with the highest probability.
         #If the temperature is very high, then the sampling will be closer to uniform, with all events having roughly equal probability.
         
         p = p / np.sum(p)  # Normalizing the initial distribution
-        p = np.log(p) / temperature  
-        p = np.exp(p)  
-        p = p / np.sum(p) # Normalizing the final distribution
-        return p
+        p = np.exp(p / temperature)  
+        final_p = p / np.sum(p) # Normalizing the final distribution
+        return final_p
 
 
     
