@@ -5,8 +5,6 @@ Example Experimentalist Sampler
 
 import numpy as np
 from typing import Optional
-from autora.experimentalist.sampler import get_scored_samples_from_model_prediction # not sure if the path is right
-from autora.experimentalist.sampler import compute_dissimilarity # not sure if the path is right
 
 
 def adjust_distribution(p, temperature):
@@ -23,56 +21,64 @@ def adjust_distribution(p, temperature):
 
 
     
-def mixture_sampler(
-    condition_pool: np.ndarray, weights: np.ndarray, temperature: int, 
-    X_ref: np.ndarray, 
-    X_train: np.ndarray,
-    Y_train: np.ndarray, Y_predicted, num_samples: Optional[int] = None) -> np.ndarray:
+def mixture_sampler(condition_pool: np.ndarray, temperature: float, samplers: list, params: dict, num_samples: Optional[int] = None) -> np.ndarray:
     """
-    Add a description of the sampler here.
 
     Args:
         condition_pool: pool of experimental conditions to evaluate
-        num_samples: number of experimental conditions to select
-        weights: array containing 4 weights -- importance of the falsification, confirmation, novelty, and familiarity (ideally, each pair of opposites? sums up to 1 or all? sum up to 1)
         temperature: how random is selection of conditions (cannot be 0; (0:1) - the choices are more deterministic than the choices made wrt
-        the mixture scores; 1 - choices are made wrt to the mixture scores; (1, inf) - the choices are more random)
-        X_ref, X_train, Y_train, Y_predicted: parameters required for falsification and novelty samplers
-    
+        samplers: tuple containing sampler functions, their names, and weights 
+        for sampler functions that return both positive and negative scores, user can provide a list with two weights: the first one will be applied to positive scores, the second one -- to the negative
+        params: nested dictionary. keys correspond to the sampler function names (same as provided in samplers),
+        values correspond to the dictionaries of function arguments (argument name: its value)
+        num_samples: number of experimental conditions to select
+        
     Returns:
         Sampled pool of experimental conditions
     """
     
+    rankings = []
+    scores = []
     
-    falsification_ranking, falsification_scores = get_scored_samples_from_model_prediction(condition_pool, 
-                                                                                           Y_predicted, X_train,
-                                                                                           Y_train, n=condition_pool.shape[0])
+    ## getting rankings and weighted scores from each function
+    for (function, name, weight) in samplers:
+        sampler_params = params[name]
+        cur_ranking, cur_scores = function(condition_pool=condition_pool, **sampler_params)
+        cur_indices = np.argsort(cur_ranking, axis=None)
+        cur_ranking_sorted = cur_ranking[cur_indices]
+        rankings.append(cur_ranking_sorted) # for checking: all elements should be the same & same order
+        ## if function scores can be negative, then create a reversed dimension for them
+        if np.sum(cur_scores<0)>0:
+            
+            cur_scores_positive = np.copy(cur_scores)
+            cur_scores_positive[cur_scores<0]=0
+            cur_scores_negative = -np.copy(cur_scores)
+            cur_scores_negative[cur_scores>0]=0
+            
+            # aligning scores
+            cur_scores_positive_sorted = cur_scores_positive[cur_indices]
+            cur_scores_negative_sorted = cur_scores_negative[cur_indices]
+            
+            # if only one weight is provided, use it for both negative and positive dimensions
+            if isinstance(weight, int):
+                cur_scores_positive_weighted = cur_scores_positive_sorted * weight
+                cur_scores_negative_weighted = cur_scores_negative_sorted * weight
+            else:
+                cur_scores_positive_weighted = cur_scores_positive_sorted * weight[0] # positive dimension gets the first weight
+                cur_scores_negative_weighted = cur_scores_negative_sorted * weight[1] # negative dimension gets the second weight
+            
+            scores.append(cur_scores_positive_weighted)
+            scores.append(cur_scores_negative_weighted)
+            
+        else:
+            cur_scores_sorted = cur_scores[cur_indices]
+            if isinstance(weight, int):
+                cur_scores_weighted = cur_scores_sorted * weight
+            else: 
+                cur_scores_weighted = cur_scores_sorted * weight[0]
+            scores.append(cur_scores_weighted)
     
-    # getting rid of negative scores by introducing confirmation scores 
-    confirmation_scores = -falsification_scores
-    confirmation_scores[falsification_scores>0]=0
-    falsification_scores[falsification_scores<0]=0
-    
-    # getting rid of negative scores by introducing familiarity scores 
-    novelty_ranking, novelty_scores = compute_dissimilarity(condition_pool, X_ref, n=condition_pool.shape[0])
-    
-    familiarity_scores = -novelty_scores
-    familiarity_scores[novelty_scores>0]=0
-    novelty_scores[novelty_scores<0]=0
-    
-    # aligning the arrays based on the observations (condition pools)
-    novelty_indices = np.argsort(novelty_ranking, axis=None)
-    ranking_sorted = novelty_ranking[novelty_indices]
-    novelty_scores_sorted = novelty_scores[novelty_indices]
-    familiarity_scores_sorted = familiarity_scores[novelty_indices]
-
-    falsification_indices = np.argsort(falsification_ranking, axis=None)
-    falsification_scores_sorted = falsification_scores[falsification_indices]    
-    confirmation_scores_sorted = confirmation_scores[falsification_indices] 
-    
-    weighted_mixture_scores = falsification_scores_sorted * weights[0] + confirmation_scores_sorted * weights[1] + novelty_scores_sorted * weights[2] + familiarity_scores_sorted * weights[3] 
-    # each score is weighted by the relative importance of these different axes
-    
+    weighted_mixture_scores = np.sum(scores, axis = 0)
     
     # adjust mixture scores wrt temperature
     weighted_mixture_scores_adjusted = adjust_distribution(weighted_mixture_scores, temperature)
@@ -80,7 +86,7 @@ def mixture_sampler(
     if num_samples is None:
         num_samples = condition_pool.shape[0]
     
-    conditions = np.random.choice(ranking_sorted.T.squeeze(), num_samples,
+    conditions = np.random.choice(cur_ranking_sorted.T.squeeze(), num_samples,
               p=weighted_mixture_scores_adjusted, replace = False)
     
     return conditions
