@@ -1,5 +1,5 @@
 """
-Example Experimentalist Sampler
+Mixture Experimentalist Sampler
 """
 
 
@@ -18,6 +18,7 @@ def adjust_distribution(p, temperature):
         p = np.exp(p / temperature)  
         final_p = p / np.sum(p) # Normalizing the final distribution
         return final_p
+
 
 
     
