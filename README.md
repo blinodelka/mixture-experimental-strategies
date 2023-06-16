@@ -24,9 +24,6 @@ python -c "from autora.experimentalist.sampler.mixture_experimentalist import mi
 
 The Mixture Experimentalist can be used to select experimental conditions based on a mixture of different strategies. Here's a basic example:
 
-Usage
-The Mixture Experimentalist can be used to select experimental conditions based on a mixture of different strategies. Here's a basic example:
-
 ```python
 from autora.experimentalist.sampler.mixture import mixture_sampler
 
