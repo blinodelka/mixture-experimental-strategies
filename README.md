@@ -22,6 +22,8 @@ Check your installation by running:
 python -c "from autora.experimentalist.sampler.mixture_experimentalist import mixture_sampler"
 ```
 
+## Usage
+
 The Mixture Experimentalist can be used to select experimental conditions based on a mixture of different strategies. Here's a basic example:
 
 ```python
