@@ -27,4 +27,3 @@ def test_foo(seed):
     ... # Run tests
 ```
 
-The seed value should be consistent but not tuned to produce correct results. The integer `180` is used in many tests, inspired "180 George St., Providence, RI, USA", the office address for the Center for Computation and Visualization at Brown University, whose staff supported the development of the AutoRA package. Sensible alternatives are `42`, `31415926` and `2654435769`. See [https://en.wikipedia.org/wiki/Nothing-up-my-sleeve_number](https://en.wikipedia.org/wiki/Nothing-up-my-sleeve_number) for more inspiration.
