@@ -1,4 +1,4 @@
-# mixture_experimentalist
+# Mixture Experimentalist
 
 Explain what your contribution is doing here
 

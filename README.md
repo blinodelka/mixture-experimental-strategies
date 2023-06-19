@@ -19,7 +19,7 @@ pip install -U autora["mixture_experimentalist"]
 Check your installation by running:
 
 ```bash
-python -c "from autora.experimentalist.sampler.mixture_experimentalist import mixture_sampler"
+python -c "from autora.experimentalist.sampler.mixture_experimentalist import mixture_sample"
 ```
 
 ## Usage
@@ -36,7 +36,7 @@ samplers = ...
 params = ...
 
 # Use the mixture_sampler to select conditions
-selected_conditions = mixture_sampler(
+selected_conditions = mixture_sample(
     condition_pool=condition_pool,
     temperature=temperature,
     samplers=samplers,
