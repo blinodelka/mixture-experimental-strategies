@@ -9,4 +9,3 @@ nav:
 - Quickstart: 'quickstart.md'
 - Examples:
   - Basic Usage: 'basic-usage.ipynb'
-  - Additional Example: 'additional-example.ipynb'
