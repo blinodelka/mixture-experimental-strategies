@@ -22,7 +22,7 @@ def adjust_distribution(p, temperature):
 
 
     
-def mixture_sampler(condition_pool: np.ndarray, temperature: float, samplers: list, params: dict, num_samples: Optional[int] = None) -> np.ndarray:
+def mixture_sample(condition_pool: np.ndarray, temperature: float, samplers: list, params: dict, num_samples: Optional[int] = None) -> np.ndarray:
     """
 
     Args:
