@@ -3,7 +3,7 @@
 name = "mixture_experimentalist"
 description = "The goal of this project is to examine the performance of a mixture experimentalist–a hybrid of different experimental sampling strategies–in terms of its ability to recover a ground-truth model from synthetic data."
 authors = [{ name = "Marina Dubova", email = "marina.dubova.97@gmail.com" }]
-version = "1.0.0a1"
+dynamic = ["version"]
 
 readme = "README.md"
 license = { text = "MIT license" }
