@@ -1,4 +1,4 @@
-from autora.experimentalist.sampler.mixture_experimentalist import mixture_sample
+from autora.experimentalist.sampler.mixture import mixture_sample
 import numpy as np
 import pytest
 

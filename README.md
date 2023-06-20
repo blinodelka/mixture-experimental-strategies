@@ -19,7 +19,7 @@ pip install -U autora["experimentalist-sampler-mixture"]
 Check your installation by running:
 
 ```bash
-python -c "from autora.experimentalist.sampler.mixture_experimentalist import mixture_sample"
+python -c "from autora.experimentalist.sampler.mixture import mixture_sample"
 ```
 
 ## Usage

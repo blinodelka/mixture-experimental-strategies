@@ -7,11 +7,11 @@ You will need:
 *mixture_experimentalist is a part of the `autora` package:
 
 ```shell
-pip install -U autora["experimentalist-sampler-mixture_experimentalist"]
+pip install -U autora["experimentalist-sampler-mixture"]
 ```
 
 
 Check your installation by running:
 ```shell
-python -c "from autora.experimentalist.sampler.mixture_experimentalist import Example"
+python -c "from autora.experimentalist.sampler.mixture import Example"
 ```
