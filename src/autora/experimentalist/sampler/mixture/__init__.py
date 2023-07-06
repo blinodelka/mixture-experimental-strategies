@@ -4,7 +4,7 @@ Mixture Experimentalist Sampler
 
 
 import numpy as np
-from typing import Optional
+from typing import Optional, Iterable
 
 
 def adjust_distribution(p, temperature):
@@ -45,7 +45,18 @@ def mixture_sample(condition_pool: np.ndarray, temperature: float, samplers: lis
     for (function, name, weight) in samplers:
         sampler_params = params[name]
         cur_ranking, cur_scores = function(condition_pool=condition_pool, **sampler_params)
-        cur_indices = np.argsort(cur_ranking, axis=None)
+
+        # making sure that samples are formatted as 2d-numpy array
+        if isinstance(cur_ranking, Iterable):
+            cur_ranking = np.array(list(cur_ranking))
+
+        if isinstance(cur_ranking, list):
+            cur_ranking = np.array(list(cur_ranking))
+
+        if cur_ranking.ndim == 1:
+            cur_ranking = cur_ranking.reshape(-1, 1)
+
+        cur_indices = np.argsort(cur_ranking[:,0], axis=None)
         cur_ranking_sorted = cur_ranking[cur_indices]
         rankings.append(cur_ranking_sorted) # for checking: all elements should be the same & same order
         ## if function scores can be negative, then create a reversed dimension for them
@@ -86,8 +97,14 @@ def mixture_sample(condition_pool: np.ndarray, temperature: float, samplers: lis
     
     if num_samples is None:
         num_samples = condition_pool.shape[0]
+
+    cur_ranking_sorted_indicies = np.linspace(0, cur_ranking_sorted.shape[0] - 1, cur_ranking_sorted.shape[0]).astype(
+        int)
+
     
-    conditions = np.random.choice(cur_ranking_sorted.T.squeeze(), num_samples,
+    condition_indicies = np.random.choice(cur_ranking_sorted_indicies, num_samples,
               p=weighted_mixture_scores_adjusted, replace = False)
+
+    conditions = cur_ranking_sorted[condition_indicies]
     
     return conditions
