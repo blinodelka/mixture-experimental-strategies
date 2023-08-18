@@ -22,7 +22,7 @@ def adjust_distribution(p, temperature):
 
 
     
-def mixture_sample(conditions: Union[pd.DataFrame, np.ndarray], temperature: float,
+def sample(conditions: Union[pd.DataFrame, np.ndarray], temperature: float,
                    samplers: list, params: dict,
                    num_samples: Optional[int] = None) -> pd.DataFrame:
     """
@@ -83,3 +83,7 @@ def mixture_sample(conditions: Union[pd.DataFrame, np.ndarray], temperature: flo
     conditions_["score"] = mixture_scores
 
     return conditions_
+
+
+mixture_sample = sample
+mixture_sample.__doc__ = """Alias for `sample`"""
