@@ -4,7 +4,8 @@ Mixture Experimentalist Sampler
 
 
 import numpy as np
-from typing import Optional
+from typing import Optional, Union
+import pandas as pd
 
 
 def adjust_distribution(p, temperature):
