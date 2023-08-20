@@ -9,20 +9,18 @@ import pandas as pd
 
 
 def adjust_distribution(p, temperature):
-        # temperature cannot be 0
-        assert temperature != 0, 'Temperature cannot be 0'
+    # temperature cannot be 0
+    assert temperature != 0, 'Temperature cannot be 0'
 
-        #If the temperature is very low (close to 0), then the sampling will become almost deterministic, picking the event with the highest probability.
-        #If the temperature is very high, then the sampling will be closer to uniform, with all events having roughly equal probability.
-        
-        p = p / np.sum(p)  # Normalizing the initial distribution
-        p = np.exp(p / temperature)  
-        final_p = p / np.sum(p) # Normalizing the final distribution
-        return final_p
+    # If the temperature is very low (close to 0), then the sampling will become almost deterministic, picking the event with the highest probability.
+    # If the temperature is very high, then the sampling will be closer to uniform, with all events having roughly equal probability.
+    p_ = np.array(p)
+    p_ = p_ / np.sum(np.abs(p_))  # Normalizing the initial distribution
+    p_ = np.exp(p_ / temperature)
+    final_p = p_ / np.sum(p_)  # Normalizing the final distribution
+    return final_p
 
 
-
-    
 def sample(conditions: Union[pd.DataFrame, np.ndarray], temperature: float,
                    samplers: list, params: dict,
                    num_samples: Optional[int] = None) -> pd.DataFrame:
@@ -47,6 +45,7 @@ def sample(conditions: Union[pd.DataFrame, np.ndarray], temperature: float,
     mixture_scores = np.zeros(len(condition_pool))
     ## getting rankings and weighted scores from each function
     for (function, name, weight) in samplers:
+
         try:
             sampler_params = params[name]
             pd_ranking = function(conditions=condition_pool, **sampler_params)
@@ -54,6 +53,9 @@ def sample(conditions: Union[pd.DataFrame, np.ndarray], temperature: float,
             pd_ranking = function(conditions=condition_pool)
         # sorting by index
         pd_ranking = pd_ranking.sort_index()
+
+        if len(weight) == 1:
+            weight = weight[0]
 
         # if only one weight is provided, use it for both negative and positive dimensions
         if isinstance(weight, float) or isinstance(weight, int):
