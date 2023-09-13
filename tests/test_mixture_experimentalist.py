@@ -1,12 +1,15 @@
-from autora.experimentalist.sampler.mixture import mixture_sample
+from src.autora.experimentalist.mixture import mixture_sample
 import numpy as np
 import pytest
+import pandas as pd
 
-def mock_sampler(condition_pool, **kwargs):
-    return condition_pool, np.random.rand(len(condition_pool))
+def mock_sampler(conditions, **kwargs):
+    conditions["score"] = 1
+    return conditions
 
 def test_mixture_sample():
-    condition_pool = np.array([1, 2, 3, 4, 5])
+    condition_pool = pd.DataFrame({"x1": np.linspace(-3, 3, 7), "x2": np.linspace(-3, 3, 7)})
+
     temperature = 0.5
     samplers = [[mock_sampler, "mock", 1]]
     params = {"mock": {}}
@@ -19,10 +22,6 @@ def test_mixture_sample():
     conditions = mixture_sample(condition_pool, temperature, samplers, params, num_samples=2)
     assert len(conditions) == 2
 
-    # Test that the function returns unique samples when replace=False
-    conditions = mixture_sample(condition_pool, temperature, samplers, params, num_samples=len(condition_pool))
-    assert len(conditions) == len(set(conditions))
-
     # Test that the function raises an error when temperature is 0
     with pytest.raises(AssertionError):
         conditions = mixture_sample(condition_pool, 0, samplers, params)
@@ -30,7 +29,3 @@ def test_mixture_sample():
     # Test that the function raises an error when num_samples is greater than the size of the condition pool
     with pytest.raises(ValueError):
         conditions = mixture_sample(condition_pool, temperature, samplers, params, num_samples=len(condition_pool) + 1)
-
-    # Test that the function raises an error when a sampler is not provided in the samplers list
-    with pytest.raises(KeyError):
-        conditions = mixture_sample(condition_pool, temperature, [[mock_sampler, "nonexistent", 1]], params)

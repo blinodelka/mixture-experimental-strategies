@@ -13,13 +13,13 @@ You will need:
 Mixture Experimentalist is a part of the AutoRA package:
 
 ```bash
-pip install -U autora["experimentalist-sampler-mixture"]
+pip install -U autora["experimentalist-mixture"]
 ```
 
 Check your installation by running:
 
 ```bash
-python -c "from autora.experimentalist.sampler.mixture import mixture_sample"
+python -c "from autora.experimentalist.mixture import mixture_sample"
 ```
 
 ## Usage
@@ -27,7 +27,7 @@ python -c "from autora.experimentalist.sampler.mixture import mixture_sample"
 The Mixture Experimentalist can be used to select experimental conditions based on a mixture of different strategies. Here's a basic example:
 
 ```python
-from autora.experimentalist.sampler.mixture import mixture_sampler
+from autora.experimentalist.mixture import mixture_sample
 
 # Define your condition pool, temperature, samplers, and parameters
 condition_pool = ...
